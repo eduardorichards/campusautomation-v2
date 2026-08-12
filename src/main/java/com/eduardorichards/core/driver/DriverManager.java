@@ -1,6 +1,8 @@
 package com.eduardorichards.core.driver;
 
 import java.time.Duration;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,28 +15,26 @@ public class DriverManager {
     
     private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
 
+    private static final Map<String, Supplier<WebDriver>> BROWSER_FACTORIES = Map.of(
+        "chrome", ChromeDriver::new,
+        "firefox", FirefoxDriver::new,
+        "edge", EdgeDriver::new
+    );
+
 
     private static WebDriver createDriver() {
-        String browser = ConfigReader.getBrowser();
-        WebDriver driver;
+        String browser = ConfigReader.getBrowser().toLowerCase();
 
-        switch (browser.toLowerCase()) {
-            case "chrome":
-                driver = new ChromeDriver();
-                break;
-            case "firefox":
-                driver = new FirefoxDriver();
-                break;
-            case "edge":
-                driver = new EdgeDriver();
-                break;
-            default:
-                throw new RuntimeException("Not supported browser: " + browser);
+        Supplier<WebDriver> factory = BROWSER_FACTORIES.get(browser);
+        if (factory == null) {
+            throw new RuntimeException("Not supported browser" + browser);
         }
+
+        WebDriver driver = factory.get();
         driver.manage().timeouts().implicitlyWait(
             Duration.ofSeconds(ConfigReader.getImplicitWaitSeconds()));
         
-            return driver;
+        return driver;
     }
 
     public static WebDriver getDriver() {
