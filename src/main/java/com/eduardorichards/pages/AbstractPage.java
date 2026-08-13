@@ -2,6 +2,7 @@ package com.eduardorichards.pages;
 
 import java.time.Duration;
 
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,7 +13,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.eduardorichards.core.config.ConfigReader;
 import com.eduardorichards.core.driver.DriverManager;
-
 
 public abstract class AbstractPage {
 
@@ -36,8 +36,8 @@ public abstract class AbstractPage {
 
     protected AbstractPage() {
         this.driver = DriverManager.getDriver();
-        this.wait = new WebDriverWait(driver,
-                Duration.ofSeconds(ConfigReader.getExplicitWaitSeconds()));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getExplicitWaitSeconds()));
+        this.wait.ignoring(StaleElementReferenceException.class);
         PageFactory.initElements(driver, this);
     }
 

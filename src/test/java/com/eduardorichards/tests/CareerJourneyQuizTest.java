@@ -10,6 +10,7 @@ import com.eduardorichards.pages.CareerJourneyQuizPage;
 import com.eduardorichards.pages.GuidancePage;
 import com.eduardorichards.pages.HomePage;
 
+@Test(groups = "regression")
 public class CareerJourneyQuizTest extends BaseTest {
 
     @Test

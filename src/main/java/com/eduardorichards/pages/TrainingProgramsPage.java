@@ -3,9 +3,13 @@ package com.eduardorichards.pages;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.TimeoutException;
+
+import com.eduardorichards.model.TrainingProgram;
 
 public class TrainingProgramsPage extends AbstractPage {
 
@@ -41,13 +45,34 @@ public class TrainingProgramsPage extends AbstractPage {
         return locationSearchInput.isDisplayed();
     }
 
+    private void clearSearchInput() {
+        Keys selectAllKey = System.getProperty("os.name").toLowerCase().contains("mac")
+                ? Keys.COMMAND
+                : Keys.CONTROL;
+        locationSearchInput.sendKeys(Keys.chord(selectAllKey, "a"), Keys.BACK_SPACE);
+    }
+
+    private static final int MAX_SELECT_ATTEMPTS = 3;
+
     public void selectCountry(String countryName) {
-        WebElement previousFirstCard = resultCards.isEmpty() ? null : resultCards.get(0);
-        WebElement countryCheckBox = driver.findElement(
-                By.xpath("//div[@class='text' and normalize-space(text())='" + countryName + "']"));
-        clickElement(countryCheckBox);
-        if (previousFirstCard != null) {
-            wait.until(ExpectedConditions.stalenessOf(previousFirstCard));
+        By checkboxLocator = By.xpath(
+                "//div[@class='text' and normalize-space(text())='" + countryName + "']");
+
+        for (int attempt = 1; attempt <= MAX_SELECT_ATTEMPTS; attempt++) {
+            clearSearchInput();
+            locationSearchInput.sendKeys(countryName);
+
+            WebElement countryCheckBox = wait.until(ExpectedConditions.elementToBeClickable(checkboxLocator));
+            countryCheckBox.click();
+
+            try {
+                wait.until(ExpectedConditions.urlContains(FILTER_URL_FRAGMENT));
+                return;
+            } catch (TimeoutException retryable) {
+                if (attempt == MAX_SELECT_ATTEMPTS) {
+                    throw retryable;
+                }
+            }
         }
     }
 
@@ -55,10 +80,12 @@ public class TrainingProgramsPage extends AbstractPage {
         return waitForUrlToContain(FILTER_URL_FRAGMENT);
     }
 
-    public String captureFirstResultCardTitle() {
+    public TrainingProgram captureFirstResultCardTitle() {
         WebElement firstCard = resultCards.get(0);
         WebElement titleElement = firstCard.findElement(By.cssSelector(CARD_TITLE_CSS));
-        return getElementText(titleElement);
+        String title = getElementText(titleElement);
+        String detailUrl = firstCard.getAttribute("href");
+        return new TrainingProgram(title, detailUrl);
     }
 
     public void clickFirstResultCard() {

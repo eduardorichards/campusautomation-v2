@@ -11,6 +11,7 @@ import com.eduardorichards.pages.CareerJourneyPage;
 import com.eduardorichards.pages.HomePage;
 import com.eduardorichards.pages.SkillsPage;
 
+@Test(groups = {"smoke", "regression"})
 public class NavbarNavigationTest extends BaseTest {
 
     @Test
