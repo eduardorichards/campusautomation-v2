@@ -45,8 +45,8 @@ public class ConfigReader {
     }
 
     public static String getBrowser() {
-        return get("browser");
-    }
+        return System.getProperty("browser", get("browser"));
+        }
 
     public static int getImplicitWaitSeconds() {
         return Integer.parseInt(get("implicit.wait.seconds"));
