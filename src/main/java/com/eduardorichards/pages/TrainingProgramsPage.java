@@ -81,14 +81,19 @@ public class TrainingProgramsPage extends AbstractPage {
     }
 
     public TrainingProgram captureFirstResultCardTitle() {
-        WebElement firstCard = resultCards.get(0);
-        WebElement titleElement = firstCard.findElement(By.cssSelector(CARD_TITLE_CSS));
-        String title = getElementText(titleElement);
-        String detailUrl = firstCard.getAttribute("href");
-        return new TrainingProgram(title, detailUrl);
+        return withStaleRetry(() -> {
+            WebElement firstCard = resultCards.get(0);
+            WebElement titleElement = firstCard.findElement(By.cssSelector(CARD_TITLE_CSS));
+            String title = getElementText(titleElement);
+            String detailUrl = firstCard.getAttribute("href");
+            return new TrainingProgram(title, detailUrl);
+        });
     }
 
     public void clickFirstResultCard() {
-        clickElement(resultCards.get(0));
+        withStaleRetry(() -> {
+            clickElement(resultCards.get(0));
+            return null;
+        });
     }
 }

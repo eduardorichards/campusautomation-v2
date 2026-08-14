@@ -1,6 +1,7 @@
 package com.eduardorichards.pages;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -80,6 +81,27 @@ public abstract class AbstractPage {
     protected void clickElement(WebElement element) {
         waitForVisibility(element);
         element.click();
+    }
+
+    private static final int MAX_STALE_RETRY_ATTEMPTS = 3;
+
+    /**
+     * Re-runs {@code action} when the DOM re-renders between locating an
+     * element and using it (React result lists in particular), retrying up
+     * to {@link #MAX_STALE_RETRY_ATTEMPTS} times before giving up.
+     */
+    protected <T> T withStaleRetry(Supplier<T> action) {
+        StaleElementReferenceException lastException = null;
+
+        for (int attempt = 1; attempt <= MAX_STALE_RETRY_ATTEMPTS; attempt++) {
+            try {
+                return action.get();
+            } catch (StaleElementReferenceException stale) {
+                lastException = stale;
+            }
+        }
+
+        throw lastException;
     }
 
     public void clickCareerJourney() {
