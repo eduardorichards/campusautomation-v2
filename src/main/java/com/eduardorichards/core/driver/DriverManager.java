@@ -12,15 +12,13 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import com.eduardorichards.core.config.ConfigReader;
 
 public class DriverManager {
-    
+
     private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
 
     private static final Map<String, Supplier<WebDriver>> BROWSER_FACTORIES = Map.of(
-        "chrome", ChromeDriver::new,
-        "firefox", FirefoxDriver::new,
-        "edge", EdgeDriver::new
-    );
-
+            "chrome", ChromeDriver::new,
+            "firefox", FirefoxDriver::new,
+            "edge", EdgeDriver::new);
 
     private static WebDriver createDriver() {
         String browser = ConfigReader.getBrowser().toLowerCase();
@@ -32,8 +30,8 @@ public class DriverManager {
 
         WebDriver driver = factory.get();
         driver.manage().timeouts().implicitlyWait(
-            Duration.ofSeconds(ConfigReader.getImplicitWaitSeconds()));
-        
+                Duration.ofSeconds(ConfigReader.getImplicitWaitSeconds()));
+
         return driver;
     }
 
@@ -45,9 +43,13 @@ public class DriverManager {
     }
 
     public static void quitDriver() {
-        if (DRIVER.get() != null) {
-            DRIVER.get().quit();
-            DRIVER.remove();
+        WebDriver driver = DRIVER.get();
+        if (driver != null) {
+            try {
+                driver.quit();
+            } finally {
+                DRIVER.remove();
+            }
         }
-    } 
+    }
 }
