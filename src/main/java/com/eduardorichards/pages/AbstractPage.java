@@ -50,7 +50,7 @@ public abstract class AbstractPage {
 
     public String getHeadingText() {
         isLoaded();
-        return getElementText(pageHeading);
+        return waitForStableText(pageHeading);
     }
 
     protected WebElement getPageHeadingElement() {
@@ -102,6 +102,25 @@ public abstract class AbstractPage {
         }
 
         throw lastException;
+    }
+
+    private static final Duration STABILITY_CHECK_INTERVAL = Duration.ofMillis(150);
+
+    protected String waitForStableText(WebElement element) {
+        return wait.until(driver -> {
+            String firstRead = element.getText();
+            sleepQuietly(STABILITY_CHECK_INTERVAL);
+            String secondRead = element.getText();
+            return (!firstRead.isEmpty() && firstRead.equals(secondRead)) ? firstRead : null;
+        });
+    }
+
+    private void sleepQuietly(Duration duration) {
+        try {
+            Thread.sleep(duration.toMillis());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public void clickCareerJourney() {
