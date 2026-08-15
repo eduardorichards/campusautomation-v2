@@ -8,12 +8,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eduardorichards.core.config.ConfigReader;
 
 public class DriverManager {
 
     private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
+    private static final Logger log = LoggerFactory.getLogger(DriverManager.class);
 
     private static final Map<String, Supplier<WebDriver>> BROWSER_FACTORIES = Map.of(
             "chrome", ChromeDriver::new,
@@ -28,9 +31,13 @@ public class DriverManager {
             throw new RuntimeException("Not supported browser" + browser);
         }
 
-        WebDriver driver = factory.get();
+        WebDriver rawDriver = factory.get();
+        WebDriver driver = new LoggingDriverDecorator().decorate(rawDriver);
+
         driver.manage().timeouts().implicitlyWait(
                 Duration.ofSeconds(ConfigReader.getImplicitWaitSeconds()));
+        
+        log.info("Created {} driver on thread {}",browser, Thread.currentThread().getId());
 
         return driver;
     }

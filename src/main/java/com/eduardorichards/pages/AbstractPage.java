@@ -11,14 +11,18 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eduardorichards.core.config.ConfigReader;
 import com.eduardorichards.core.driver.DriverManager;
 
 public abstract class AbstractPage {
-
+    
     protected final WebDriver driver;
     protected final WebDriverWait wait;
+    private static final int MAX_STALE_RETRY_ATTEMPTS = 3;
+    private static final Logger log = LoggerFactory.getLogger(AbstractPage.class);
 
     @FindBy(tagName = "h1")
     private WebElement pageHeading;
@@ -83,7 +87,6 @@ public abstract class AbstractPage {
         element.click();
     }
 
-    private static final int MAX_STALE_RETRY_ATTEMPTS = 3;
 
     /**
      * Re-runs {@code action} when the DOM re-renders between locating an
@@ -98,9 +101,10 @@ public abstract class AbstractPage {
                 return action.get();
             } catch (StaleElementReferenceException stale) {
                 lastException = stale;
+                log.warn("Stale element on attemp {}/{}, retrying", attempt, MAX_STALE_RETRY_ATTEMPTS);
             }
         }
-
+        log.error("Exhausted {} retry attemps due to stale element", MAX_STALE_RETRY_ATTEMPTS);
         throw lastException;
     }
 

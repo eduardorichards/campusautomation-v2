@@ -10,6 +10,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eduardorichards.core.config.ConfigReader;
 
@@ -17,6 +19,7 @@ public class HomePage extends AbstractPage {
 
     private static final String URL_FRAGMENT = "/en";
     private static final String COOKIE_ACCEPT_BUTTON_CSS = "#onetrust-accept-btn-handler";
+    private static final Logger log = LoggerFactory.getLogger(HomePage.class);
 
     @FindBy(css = "[data-cy='find-program-btn'] a")
     private WebElement findAProgramButton;
@@ -53,12 +56,14 @@ public class HomePage extends AbstractPage {
             try {
                 acceptButton.click();
             } catch (ElementClickInterceptedException interceptedByAnimation) {
+                log.warn("click intercepted on cookie banner, falling back to JS click");
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", acceptButton);
             }
 
             new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getExplicitWaitSeconds()))
                     .until(ExpectedConditions.stalenessOf(acceptButton));
         } catch (TimeoutException bannerNotPresent) {
+            log.debug("Cookie banner not present, skipping dismissal");
             // intended empty
         }
     }
