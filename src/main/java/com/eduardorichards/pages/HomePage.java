@@ -61,7 +61,7 @@ public class HomePage extends AbstractPage {
             }
 
             new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getExplicitWaitSeconds()))
-                    .until(ExpectedConditions.stalenessOf(acceptButton));
+                    .until(ExpectedConditions.invisibilityOf(acceptButton));
         } catch (TimeoutException bannerNotPresent) {
             log.debug("Cookie banner not present, skipping dismissal");
             // intended empty
