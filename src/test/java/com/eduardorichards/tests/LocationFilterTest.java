@@ -18,8 +18,8 @@ public class LocationFilterTest extends BaseTest {
     @DataProvider(name = "countries")
     public Object[][] countries() {
         return ConfigReader.getFilterCountries().stream()
-            .map(country -> new Object[]{country})
-            .toArray(Object[][]::new);
+                .map(country -> new Object[] { country })
+                .toArray(Object[][]::new);
     }
 
     @Test(dataProvider = "countries")
@@ -37,8 +37,7 @@ public class LocationFilterTest extends BaseTest {
         trainingProgramsPage.selectCountry(country);
         assertTrue(trainingProgramsPage.isFilterApplied());
 
-        TrainingProgram expectedProgram = trainingProgramsPage.captureFirstResultCardTitle();
-        trainingProgramsPage.clickFirstResultCard();
+        TrainingProgram expectedProgram = trainingProgramsPage.openFirstResultCard();
 
         ProgramDetailPage programDetailPage = new ProgramDetailPage();
         assertEquals(programDetailPage.getHeadingText(), expectedProgram.getTitle());

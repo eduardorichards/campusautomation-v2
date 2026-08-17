@@ -20,10 +20,10 @@ public class TrainingProgramsPage extends AbstractPage {
 
     @FindBy(xpath = "//div[@role='button' and normalize-space()='Location']")
     private List<WebElement> locationFiltertriggerCandidates;
-    
+
     @FindBy(css = "input[placeholder='Search']")
     private WebElement locationSearchInput;
-    
+
     @FindBy(xpath = RESULT_CARD_XPATH)
     private List<WebElement> resultCards;
 
@@ -37,12 +37,10 @@ public class TrainingProgramsPage extends AbstractPage {
     }
 
     public void openLocationFilter() {
-        WebElement visibleTrigger = wait.until(driver ->
-            locationFiltertriggerCandidates.stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElse(null)
-        );
+        WebElement visibleTrigger = wait.until(driver -> locationFiltertriggerCandidates.stream()
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElse(null));
         clickElement(visibleTrigger);
     }
 
@@ -86,20 +84,13 @@ public class TrainingProgramsPage extends AbstractPage {
         return waitForUrlToContain(FILTER_URL_FRAGMENT);
     }
 
-    public TrainingProgram captureFirstResultCardTitle() {
+    public TrainingProgram openFirstResultCard() {
         return withStaleRetry(() -> {
             WebElement firstCard = resultCards.get(0);
-            WebElement titleElement = firstCard.findElement(By.cssSelector(CARD_TITLE_CSS));
-            String title = getElementText(titleElement);
-            String detailUrl = firstCard.getAttribute("href");
+            String title = firstCard.findElement(By.cssSelector(CARD_TITLE_CSS)).getText();
+            String detailUrl = firstCard.getDomProperty("href");
+            firstCard.click();
             return new TrainingProgram(title, detailUrl);
-        });
-    }
-
-    public void clickFirstResultCard() {
-        withStaleRetry(() -> {
-            clickElement(resultCards.get(0));
-            return null;
         });
     }
 }
