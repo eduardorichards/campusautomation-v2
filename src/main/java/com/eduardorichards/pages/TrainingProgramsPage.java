@@ -19,11 +19,11 @@ public class TrainingProgramsPage extends AbstractPage {
     private static final String CARD_TITLE_CSS = "[class*='training-card_card-name__']";
 
     @FindBy(xpath = "//div[@role='button' and normalize-space()='Location']")
-    private WebElement locationFilterTrigger;
-
+    private List<WebElement> locationFiltertriggerCandidates;
+    
     @FindBy(css = "input[placeholder='Search']")
     private WebElement locationSearchInput;
-
+    
     @FindBy(xpath = RESULT_CARD_XPATH)
     private List<WebElement> resultCards;
 
@@ -37,7 +37,13 @@ public class TrainingProgramsPage extends AbstractPage {
     }
 
     public void openLocationFilter() {
-        clickElement(locationFilterTrigger);
+        WebElement visibleTrigger = wait.until(driver ->
+            locationFiltertriggerCandidates.stream()
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElse(null)
+        );
+        clickElement(visibleTrigger);
     }
 
     public boolean isLocationDropdownOpen() {
