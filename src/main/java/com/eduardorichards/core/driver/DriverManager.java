@@ -26,7 +26,11 @@ public class DriverManager {
     private static WebDriver createChromeDriver() {
         ChromeOptions options = new ChromeOptions();
         if (ConfigReader.isHeadless()) {
-            options.addArguments("--headless=new", "--window-size=1920,1080");
+            options.addArguments(
+                "--headless=new",
+                "--window-size=1920,1080",
+                "--no-sandbox",
+                "disable-dev-shm-usage");
         }
         return new ChromeDriver(options);
     }
