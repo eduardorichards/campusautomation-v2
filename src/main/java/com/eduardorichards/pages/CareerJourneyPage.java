@@ -28,7 +28,7 @@ public class CareerJourneyPage extends AbstractPage {
     @Override
     public String getHeadingText() {
         isLoaded();
-        WebElement visibleHeading = wait.until(driver ->
+        WebElement visibleHeading = staletolerantWait().until(driver ->
             journeyHeadingCandidates.stream()
                 .filter(WebElement::isDisplayed)
                 .findFirst()
@@ -37,7 +37,7 @@ public class CareerJourneyPage extends AbstractPage {
     }
 
     public void clickStartTest() {
-        WebElement visibleButton = wait.until(driver ->
+        WebElement visibleButton = staletolerantWait().until(driver ->
             startTestButtonCandidates.stream()
                 .filter(WebElement::isDisplayed)
                 .findFirst()

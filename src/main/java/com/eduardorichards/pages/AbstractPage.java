@@ -42,8 +42,14 @@ public abstract class AbstractPage {
     protected AbstractPage() {
         this.driver = DriverManager.getDriver();
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getExplicitWaitSeconds()));
-        this.wait.ignoring(StaleElementReferenceException.class);
         PageFactory.initElements(driver, this);
+    }
+
+    protected WebDriverWait staletolerantWait() {
+        WebDriverWait tolerant = new WebDriverWait(driver, 
+            Duration.ofSeconds(ConfigReader.getExplicitWaitSeconds()));
+        tolerant.ignoring(StaleElementReferenceException.class);
+        return tolerant;
     }
 
     protected abstract String getUrlFragment();
